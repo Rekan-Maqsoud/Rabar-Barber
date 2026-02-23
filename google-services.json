@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "775038906420",
+    "firebase_url": "https://rabar-barber-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "rabar-barber",
+    "storage_bucket": "rabar-barber.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:775038906420:android:25c9a6220834da82135a61",
+        "android_client_info": {
+          "package_name": "com.rabarbarber.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAu01E40Psu6ap1MDOwGuy3KFqJfF9eZfU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
