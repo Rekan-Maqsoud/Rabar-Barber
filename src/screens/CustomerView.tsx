@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Image, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../theme/ThemeContext';
 import { joinQueue, removeCustomer, subscribeToQueue } from '../services/queueService';
@@ -12,6 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 export const CustomerView = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const navigation = useNavigation<any>();
   const [name, setName] = useState('');
   const [service, setService] = useState<ServiceType | undefined>();
   const [queue, setQueue] = useState<Customer[]>([]);
@@ -266,6 +268,22 @@ export const CustomerView = () => {
       backgroundColor: theme.border,
       marginVertical: 8,
     },
+    footer: {
+      alignItems: 'center',
+      marginTop: 12,
+      marginBottom: 8,
+    },
+    footerText: {
+      fontSize: 11,
+      color: theme.textMuted,
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    footerLink: {
+      fontSize: 11,
+      color: theme.primary,
+      fontWeight: '700',
+    },
   });
 
   if (loading) return <View style={[styles.container, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={theme.primary} /></View>;
@@ -389,6 +407,12 @@ export const CustomerView = () => {
           ))}
         </View>
       )}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Made By Rekan M Koye</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')} activeOpacity={0.7}>
+          <Text style={styles.footerLink}>{t('privacyPolicy')}</Text>
+        </TouchableOpacity>
+      </View>
       <View style={{ height: 50 }} />
     </ScrollView>
   );

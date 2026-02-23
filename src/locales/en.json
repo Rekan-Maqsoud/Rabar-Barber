@@ -61,6 +61,7 @@
     "language": "Language",
     "theme": "Theme",
     "light": "Light",
-    "dark": "Dark"
+    "dark": "Dark",
+    "privacyPolicy": "Privacy Policy"
   }
 }

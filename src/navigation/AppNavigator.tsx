@@ -9,6 +9,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { CustomerView } from '../screens/CustomerView';
 import { AdminQueue } from '../screens/AdminQueue';
 import { AdminAnalytics } from '../screens/AdminAnalytics';
+import { PrivacyPolicy } from '../screens/PrivacyPolicy';
 
 const Stack = createNativeStackNavigator();
 
@@ -106,6 +107,11 @@ export const AppNavigator = () => {
           name="AdminAnalytics" 
           component={AdminAnalytics} 
           options={{ title: t('adminAnalytics').toUpperCase() }} 
+        />
+        <Stack.Screen
+          name="PrivacyPolicy"
+          component={PrivacyPolicy}
+          options={{ title: t('privacyPolicy') }}
         />
       </Stack.Navigator>
     </NavigationContainer>
