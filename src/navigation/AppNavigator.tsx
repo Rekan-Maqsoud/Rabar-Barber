@@ -17,6 +17,18 @@ export const AppNavigator = () => {
   const { t, i18n } = useTranslation();
   const { theme, isDark, toggleTheme } = useTheme();
 
+  const linking = {
+    prefixes: ['https://rabar-barber.vercel.app'],
+    config: {
+      screens: {
+        CustomerView: '',
+        AdminQueue: 'admin-queue',
+        AdminAnalytics: 'admin-analytics',
+        PrivacyPolicy: 'privacy-policy',
+      },
+    },
+  };
+
   const toggleLanguage = () => {
     const nextLang = i18n.language === 'en' ? 'ckb' : i18n.language === 'ckb' ? 'ar' : 'en';
     i18n.changeLanguage(nextLang);
@@ -67,7 +79,7 @@ export const AppNavigator = () => {
   );
 
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator
         screenOptions={({ navigation }: { navigation: any }) => ({
           headerStyle: { backgroundColor: theme.surface },
