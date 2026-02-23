@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../theme/ThemeContext';
 import { getRevenueStats } from '../services/queueService';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export const AdminAnalytics = () => {
   const { t, i18n } = useTranslation();
@@ -78,34 +79,101 @@ export const AdminAnalytics = () => {
 
   const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.background, padding: 20 },
-    title: { fontSize: 28, fontWeight: '900', color: theme.text, marginBottom: 28, marginTop: 10, letterSpacing: 1, textTransform: 'uppercase' },
-    card: { backgroundColor: theme.surface, padding: 24, borderRadius: 20, marginBottom: 20, shadowColor: theme.primary, shadowOpacity: 0.08, shadowRadius: 15, shadowOffset: { width: 0, height: 8 }, elevation: 5, borderWidth: 1, borderColor: theme.border, flexDirection: 'row', alignItems: 'center' },
-    iconContainer: { width: 64, height: 64, borderRadius: 32, backgroundColor: theme.background, justifyContent: 'center', alignItems: 'center', marginRight: 20, borderWidth: 1.5, borderColor: theme.border, shadowColor: theme.primary, shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 3 },
+    title: { fontSize: 26, fontWeight: '900', color: theme.text, marginBottom: 28, marginTop: 10, letterSpacing: 1, textTransform: 'uppercase' },
+    card: {
+      backgroundColor: theme.surface,
+      padding: 22,
+      borderRadius: 22,
+      marginBottom: 18,
+      shadowColor: theme.cardShadow,
+      shadowOpacity: 1,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 5,
+      borderWidth: 1,
+      borderColor: theme.border,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    iconContainer: {
+      width: 60,
+      height: 60,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 18,
+      overflow: 'hidden',
+    },
+    iconGradient: {
+      width: 60,
+      height: 60,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     contentContainer: { flex: 1 },
-    label: { fontSize: 15, color: theme.textSecondary, marginBottom: 6, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
-    value: { fontSize: 32, fontWeight: '900', color: theme.text, letterSpacing: 0.5 },
+    label: { fontSize: 12, color: theme.textSecondary, marginBottom: 6, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 },
+    value: { fontSize: 30, fontWeight: '900', color: theme.text, letterSpacing: 0.3 },
     miniGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 8 },
-    miniCard: { width: '48.5%', backgroundColor: theme.surface, borderRadius: 16, borderWidth: 1, borderColor: theme.border, padding: 16, marginBottom: 12 },
-    miniLabel: { color: theme.textSecondary, fontWeight: '700', fontSize: 12, textTransform: 'uppercase' },
-    miniValue: { color: theme.text, fontSize: 22, fontWeight: '900', marginTop: 6 },
-    sectionCard: { backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.border, borderRadius: 20, padding: 18, marginBottom: 18 },
-    sectionTitle: { color: theme.text, fontWeight: '800', fontSize: 16, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 0.5 },
+    miniCard: {
+      width: '48.5%',
+      backgroundColor: theme.surface,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: theme.border,
+      padding: 18,
+      marginBottom: 12,
+      shadowColor: theme.cardShadow,
+      shadowOpacity: 1,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 3,
+    },
+    miniLabel: { color: theme.textSecondary, fontWeight: '700', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8 },
+    miniValue: { color: theme.text, fontSize: 20, fontWeight: '900', marginTop: 8 },
+    sectionCard: {
+      backgroundColor: theme.surface,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 22,
+      padding: 20,
+      marginBottom: 18,
+      shadowColor: theme.cardShadow,
+      shadowOpacity: 1,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 4,
+    },
+    sectionTitle: { color: theme.text, fontWeight: '800', fontSize: 15, marginBottom: 18, textTransform: 'uppercase', letterSpacing: 0.8 },
     chartRow: { flexDirection: 'row', alignItems: 'flex-end', minHeight: 180 },
     barWrap: { width: 48, alignItems: 'center', marginRight: 8 },
-    bar: { width: 24, borderTopLeftRadius: 6, borderTopRightRadius: 6, minHeight: 4 },
-    barLabel: { color: theme.textSecondary, fontSize: 10, marginTop: 6, textAlign: 'center' },
+    bar: { width: 24, borderRadius: 8, minHeight: 4, overflow: 'hidden' },
+    barGradient: { flex: 1, borderRadius: 8 },
+    barLabel: { color: theme.textMuted, fontSize: 10, marginTop: 6, textAlign: 'center', fontWeight: '600' },
     valueLabel: { color: theme.text, fontSize: 10, marginBottom: 6, fontWeight: '700' },
-    serviceRow: { marginBottom: 12 },
-    serviceHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-    serviceName: { color: theme.text, fontWeight: '700' },
+    serviceRow: { marginBottom: 14 },
+    serviceHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
+    serviceName: { color: theme.text, fontWeight: '700', fontSize: 14 },
     serviceMeta: { color: theme.textSecondary, fontWeight: '700', fontSize: 12 },
-    serviceBarTrack: { width: '100%', height: 10, borderRadius: 8, backgroundColor: theme.background, overflow: 'hidden' },
-    serviceBarFill: { height: 10, borderRadius: 8, backgroundColor: theme.primary },
-    dropdownButton: { borderWidth: 1, borderColor: theme.border, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: theme.background, marginBottom: 12 },
+    serviceBarTrack: { width: '100%', height: 10, borderRadius: 8, backgroundColor: theme.backgroundSecondary, overflow: 'hidden' },
+    serviceBarFill: { height: 10, borderRadius: 8, overflow: 'hidden' },
+    serviceBarGradient: { flex: 1, borderRadius: 8 },
+    dropdownButton: {
+      borderWidth: 1.5,
+      borderColor: theme.border,
+      borderRadius: 14,
+      paddingVertical: 12,
+      paddingHorizontal: 14,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: theme.backgroundSecondary,
+      marginBottom: 14,
+    },
     dropdownText: { color: theme.text, fontWeight: '700' },
-    dropdownList: { borderWidth: 1, borderColor: theme.border, borderRadius: 12, overflow: 'hidden', marginBottom: 12 },
-    dropdownItem: { paddingVertical: 10, paddingHorizontal: 12, backgroundColor: theme.background },
-    dropdownItemActive: { backgroundColor: theme.surface, borderLeftWidth: 3, borderLeftColor: theme.primary },
+    dropdownList: { borderWidth: 1, borderColor: theme.border, borderRadius: 14, overflow: 'hidden', marginBottom: 14 },
+    dropdownItem: { paddingVertical: 12, paddingHorizontal: 14, backgroundColor: theme.backgroundSecondary },
+    dropdownItemActive: { backgroundColor: theme.primaryLight, borderLeftWidth: 4, borderLeftColor: theme.primary },
     dropdownItemText: { color: theme.text, fontWeight: '600' },
   });
 
@@ -116,19 +184,19 @@ export const AdminAnalytics = () => {
       <Text style={styles.title}>{t('adminAnalytics')}</Text>
 
       <View style={styles.miniGrid}>
-        <View style={styles.miniCard}>
+        <View style={[styles.miniCard, { borderLeftWidth: 4, borderLeftColor: theme.primary }]}>
           <Text style={styles.miniLabel}>{t('totalRevenue')}</Text>
           <Text style={styles.miniValue}>{formatIQD(stats.totalRevenue)}</Text>
         </View>
-        <View style={styles.miniCard}>
+        <View style={[styles.miniCard, { borderLeftWidth: 4, borderLeftColor: theme.accent }]}>
           <Text style={styles.miniLabel}>{t('averageTicket')}</Text>
           <Text style={styles.miniValue}>{formatIQD(stats.averageTicket)}</Text>
         </View>
-        <View style={styles.miniCard}>
+        <View style={[styles.miniCard, { borderLeftWidth: 4, borderLeftColor: theme.success }]}>
           <Text style={styles.miniLabel}>{t('allTimeCustomers')}</Text>
           <Text style={styles.miniValue}>{stats.totalCustomersAllTime}</Text>
         </View>
-        <View style={styles.miniCard}>
+        <View style={[styles.miniCard, { borderLeftWidth: 4, borderLeftColor: theme.warning }]}>
           <Text style={styles.miniLabel}>{t('dailyAverageThisMonth')}</Text>
           <Text style={styles.miniValue}>{formatIQD(stats.dailyAverageThisMonth)}</Text>
         </View>
@@ -136,7 +204,9 @@ export const AdminAnalytics = () => {
       
       <View style={styles.card}>
         <View style={styles.iconContainer}>
-          <MaterialCommunityIcons name="cash-multiple" size={32} color={theme.success} />
+          <LinearGradient colors={[theme.gradientSuccessStart, theme.gradientSuccessEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.iconGradient}>
+            <MaterialCommunityIcons name="cash-multiple" size={28} color="#FFFFFF" />
+          </LinearGradient>
         </View>
         <View style={styles.contentContainer}>
           <Text style={styles.label}>{t('totalRevenueToday')}</Text>
@@ -146,7 +216,9 @@ export const AdminAnalytics = () => {
 
       <View style={styles.card}>
         <View style={styles.iconContainer}>
-          <MaterialCommunityIcons name="calendar-week" size={32} color={theme.primary} />
+          <LinearGradient colors={[theme.gradientPrimaryStart, theme.gradientPrimaryEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.iconGradient}>
+            <MaterialCommunityIcons name="calendar-week" size={28} color="#FFFFFF" />
+          </LinearGradient>
         </View>
         <View style={styles.contentContainer}>
           <Text style={styles.label}>{t('weeklyRevenue')}</Text>
@@ -156,7 +228,9 @@ export const AdminAnalytics = () => {
 
       <View style={styles.card}>
         <View style={styles.iconContainer}>
-          <MaterialCommunityIcons name="calendar-month" size={32} color={theme.primary} />
+          <LinearGradient colors={[theme.gradientAccentStart, theme.gradientAccentEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.iconGradient}>
+            <MaterialCommunityIcons name="calendar-month" size={28} color="#FFFFFF" />
+          </LinearGradient>
         </View>
         <View style={styles.contentContainer}>
           <Text style={styles.label}>{t('monthlyRevenue')}</Text>
@@ -166,7 +240,9 @@ export const AdminAnalytics = () => {
 
       <View style={styles.card}>
         <View style={styles.iconContainer}>
-          <MaterialCommunityIcons name="account-group" size={32} color={theme.warning} />
+          <LinearGradient colors={[theme.gradientWarningStart, theme.gradientWarningEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.iconGradient}>
+            <MaterialCommunityIcons name="account-group" size={28} color="#FFFFFF" />
+          </LinearGradient>
         </View>
         <View style={styles.contentContainer}>
           <Text style={styles.label}>{t('totalCustomersToday')}</Text>
@@ -176,11 +252,13 @@ export const AdminAnalytics = () => {
 
       <View style={styles.card}>
         <View style={styles.iconContainer}>
-          <MaterialCommunityIcons name="star-circle" size={32} color={theme.warning} />
+          <LinearGradient colors={[theme.gradientPrimaryStart, theme.gradientPrimaryEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.iconGradient}>
+            <MaterialCommunityIcons name="star-circle" size={28} color="#FFFFFF" />
+          </LinearGradient>
         </View>
         <View style={styles.contentContainer}>
           <Text style={styles.label}>{t('mostPopularService')}</Text>
-          <Text style={[styles.value, { fontSize: 22 }]}>{stats.popularService === 'None' ? t('none') : formatService(stats.popularService)}</Text>
+          <Text style={[styles.value, { fontSize: 20 }]}>{stats.popularService === 'None' ? t('none') : formatService(stats.popularService)}</Text>
         </View>
       </View>
 
@@ -195,7 +273,14 @@ export const AdminAnalytics = () => {
               return (
                 <View key={String(month.monthStart)} style={styles.barWrap}>
                   <Text style={styles.valueLabel}>{Math.round(month.revenue).toLocaleString()}</Text>
-                  <View style={[styles.bar, { height, backgroundColor: theme.primary }]} />
+                  <View style={[styles.bar, { height }]}>
+                    <LinearGradient
+                      colors={[theme.gradientPrimaryStart, theme.gradientPrimaryEnd]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 0, y: 1 }}
+                      style={styles.barGradient}
+                    />
+                  </View>
                   <Text style={styles.barLabel}>{label}</Text>
                 </View>
               );
@@ -246,7 +331,14 @@ export const AdminAnalytics = () => {
               return (
                 <View key={String(day.dayStart)} style={styles.barWrap}>
                   <Text style={styles.valueLabel}>{Math.round(day.revenue).toLocaleString()}</Text>
-                  <View style={[styles.bar, { width: 22, height, backgroundColor: theme.warning }]} />
+                  <View style={[styles.bar, { width: 22, height }]}>
+                    <LinearGradient
+                      colors={[theme.gradientWarningStart, theme.gradientWarningEnd]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 0, y: 1 }}
+                      style={styles.barGradient}
+                    />
+                  </View>
                   <Text style={styles.barLabel}>{label}</Text>
                 </View>
               );
@@ -270,7 +362,14 @@ export const AdminAnalytics = () => {
                 <Text style={styles.serviceMeta}>{item.count} • {formatIQD(item.revenue)}</Text>
               </View>
               <View style={styles.serviceBarTrack}>
-                <View style={[styles.serviceBarFill, { width: `${widthPercent}%` as `${number}%` }]} />
+                <View style={[styles.serviceBarFill, { width: `${widthPercent}%` as `${number}%` }]}>
+                  <LinearGradient
+                    colors={[theme.gradientPrimaryStart, theme.gradientAccentEnd]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.serviceBarGradient}
+                  />
+                </View>
               </View>
             </View>
           );

@@ -7,6 +7,7 @@ import { Customer } from '../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { setAdminNotificationSession } from '../services/adminSessionService';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const ADMIN_PASSWORD = 'admin'; // Simple password for demonstration
 
@@ -221,92 +222,221 @@ export const AdminQueue = () => {
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, marginTop: 10 },
     headerLeft: { flexDirection: 'row', alignItems: 'center' },
     brandIconContainer: {
-      width: 42,
-      height: 42,
-      borderRadius: 21,
+      width: 46,
+      height: 46,
+      borderRadius: 23,
       overflow: 'hidden',
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: theme.surface,
-      marginRight: 10,
+      backgroundColor: theme.surfaceElevated,
+      marginRight: 12,
+      borderWidth: 2,
+      borderColor: theme.primaryLight,
+      shadowColor: theme.primary,
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 3 },
+      elevation: 4,
     },
     brandIcon: { width: '90%', height: '90%' },
-    title: { flexShrink: 1, fontSize: 24, fontWeight: '900', color: theme.text, letterSpacing: 0.5 },
-    addButton: { backgroundColor: theme.primary, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12, flexDirection: 'row', alignItems: 'center', shadowColor: theme.primary, shadowOpacity: 0.35, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 5 },
-    addButtonText: { color: '#FFFFFF', fontWeight: '800', marginLeft: 6, fontSize: 13 },
-    card: { backgroundColor: theme.surface, padding: 20, borderRadius: 20, marginBottom: 16, shadowColor: theme.primary, shadowOpacity: 0.08, shadowRadius: 15, shadowOffset: { width: 0, height: 8 }, elevation: 5, borderWidth: 1, borderColor: theme.border },
+    title: { flexShrink: 1, fontSize: 22, fontWeight: '900', color: theme.text, letterSpacing: 0.5 },
+    addButton: {
+      overflow: 'hidden',
+      borderRadius: 14,
+      shadowColor: theme.primary,
+      shadowOpacity: 0.3,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 6,
+    },
+    addButtonGradient: {
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderRadius: 14,
+    },
+    addButtonText: { color: '#FFFFFF', fontWeight: '800', marginLeft: 7, fontSize: 13, letterSpacing: 0.3 },
+    card: {
+      backgroundColor: theme.surface,
+      padding: 22,
+      borderRadius: 22,
+      marginBottom: 14,
+      shadowColor: theme.cardShadow,
+      shadowOpacity: 1,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 5,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderLeftWidth: 4,
+      borderLeftColor: theme.border,
+    },
+    cardServing: {
+      borderLeftColor: theme.primary,
+      backgroundColor: theme.surfaceElevated,
+      shadowColor: theme.elevatedShadow,
+      shadowOpacity: 1,
+      shadowRadius: 20,
+      elevation: 8,
+    },
     cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
-    name: { fontSize: 20, fontWeight: '800', color: theme.text, letterSpacing: 0.5 },
-    service: { fontSize: 15, color: theme.primary, marginTop: 6, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
-    badge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 },
-    badgeText: { fontSize: 12, fontWeight: '800', color: '#FFF', textTransform: 'uppercase', letterSpacing: 0.5 },
+    name: { fontSize: 19, fontWeight: '800', color: theme.text, letterSpacing: 0.3 },
+    service: { fontSize: 13, color: theme.primary, marginTop: 6, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 },
+    badge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 },
+    badgeText: { fontSize: 10, fontWeight: '800', color: '#FFF', textTransform: 'uppercase', letterSpacing: 0.8 },
     badgeOnline: { backgroundColor: theme.primary },
-    badgeWalkIn: { backgroundColor: theme.textSecondary },
-    actions: { flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap', marginTop: 10 },
-    actionBtn: { width: '48%', minHeight: 46, paddingVertical: 10, paddingHorizontal: 8, borderRadius: 12, marginBottom: 8, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
-    btnDone: { backgroundColor: theme.success },
-    btnRemove: { backgroundColor: theme.danger },
-    btnMove: { backgroundColor: theme.warning },
-    btnServing: { backgroundColor: theme.primary },
-    btnText: { color: '#FFF', fontSize: 12, fontWeight: '800', marginLeft: 5 },
-    btnTextPrimary: { color: '#FFFFFF', fontSize: 12, fontWeight: '800', marginLeft: 5 },
-    modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' },
-    modalContent: { backgroundColor: theme.surface, padding: 22, borderRadius: 20, width: '90%', maxWidth: 420, shadowColor: theme.primary, shadowOpacity: 0.2, shadowRadius: 20, elevation: 12, borderWidth: 1, borderColor: theme.border },
-    modalTitle: { fontSize: 20, fontWeight: '900', color: theme.text, marginBottom: 18, textAlign: 'center', letterSpacing: 0.4 },
-    input: { borderWidth: 1.5, borderColor: theme.border, padding: 14, borderRadius: 12, color: theme.text, marginBottom: 18, fontSize: 16, backgroundColor: theme.background, fontWeight: '600', textAlign: 'center' },
+    badgeWalkIn: { backgroundColor: theme.textMuted },
+    actions: { flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap', marginTop: 12 },
+    actionBtn: {
+      width: '48%',
+      minHeight: 46,
+      paddingVertical: 11,
+      paddingHorizontal: 8,
+      borderRadius: 14,
+      marginBottom: 8,
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      overflow: 'hidden',
+    },
+    actionBtnGradient: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 14,
+    },
+    btnText: { color: '#FFF', fontSize: 12, fontWeight: '800', marginLeft: 6, letterSpacing: 0.3 },
+    btnTextPrimary: { color: '#FFFFFF', fontSize: 12, fontWeight: '800', marginLeft: 6, letterSpacing: 0.3 },
+    modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.75)' },
+    modalContent: {
+      backgroundColor: theme.surface,
+      padding: 28,
+      borderRadius: 24,
+      width: '90%',
+      maxWidth: 420,
+      shadowColor: theme.elevatedShadow,
+      shadowOpacity: 1,
+      shadowRadius: 30,
+      elevation: 14,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    modalTitle: { fontSize: 20, fontWeight: '900', color: theme.text, marginBottom: 20, textAlign: 'center', letterSpacing: 0.4 },
+    input: {
+      borderWidth: 1.5,
+      borderColor: theme.border,
+      padding: 16,
+      borderRadius: 14,
+      color: theme.text,
+      marginBottom: 20,
+      fontSize: 16,
+      backgroundColor: theme.backgroundSecondary,
+      fontWeight: '600',
+      textAlign: 'center',
+    },
     modalActions: { flexDirection: 'row', justifyContent: 'space-between' },
-    modalBtn: { paddingVertical: 12, borderRadius: 12, flex: 1, alignItems: 'center', marginHorizontal: 6 },
-    modalBtnConfirm: { backgroundColor: theme.primary, shadowColor: theme.primary, shadowOpacity: 0.3, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
-    modalBtnCancel: { backgroundColor: theme.background, borderWidth: 1.5, borderColor: theme.border },
+    modalBtn: { paddingVertical: 14, borderRadius: 14, flex: 1, alignItems: 'center', marginHorizontal: 6 },
+    modalBtnConfirm: {
+      overflow: 'hidden',
+      shadowColor: theme.primary,
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 4,
+    },
+    modalBtnCancel: { backgroundColor: theme.backgroundSecondary, borderWidth: 1.5, borderColor: theme.border },
     
     // Auth styles
     authContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.background, padding: 20 },
-    authCard: { backgroundColor: theme.surface, padding: 36, borderRadius: 24, width: '100%', maxWidth: 400, shadowColor: theme.primary, shadowOpacity: 0.15, shadowRadius: 25, elevation: 10, alignItems: 'center', borderWidth: 1, borderColor: theme.border },
+    authCard: {
+      backgroundColor: theme.surface,
+      padding: 40,
+      borderRadius: 28,
+      width: '100%',
+      maxWidth: 400,
+      shadowColor: theme.elevatedShadow,
+      shadowOpacity: 1,
+      shadowRadius: 30,
+      elevation: 12,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
     authLogoContainer: {
-      width: 72,
-      height: 72,
-      borderRadius: 36,
+      width: 80,
+      height: 80,
+      borderRadius: 40,
       overflow: 'hidden',
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: theme.background,
-      marginBottom: 20,
+      backgroundColor: theme.backgroundSecondary,
+      marginBottom: 24,
+      borderWidth: 2,
+      borderColor: theme.primaryLight,
     },
     authLogo: { width: '90%', height: '90%' },
-    authTitle: { fontSize: 28, fontWeight: '900', color: theme.text, marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' },
-    authSubtitle: { fontSize: 15, color: theme.textSecondary, marginBottom: 36, textAlign: 'center', fontWeight: '500' },
-    authInput: { width: '100%', backgroundColor: theme.background, borderWidth: 1.5, borderColor: theme.border, padding: 18, borderRadius: 14, color: theme.text, marginBottom: 20, fontSize: 16, fontWeight: '600', textAlign: 'center' },
-    authButton: { width: '100%', backgroundColor: theme.primary, padding: 18, borderRadius: 14, alignItems: 'center', shadowColor: theme.primary, shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 6 },
-    authButtonText: { color: '#FFFFFF', fontSize: 18, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' },
-    errorText: { color: theme.danger, marginBottom: 20, fontWeight: '700', fontSize: 15 },
+    authTitle: { fontSize: 26, fontWeight: '900', color: theme.text, marginBottom: 10, letterSpacing: 1.5, textTransform: 'uppercase' },
+    authSubtitle: { fontSize: 14, color: theme.textSecondary, marginBottom: 36, textAlign: 'center', fontWeight: '500', lineHeight: 20 },
+    authInput: {
+      width: '100%',
+      backgroundColor: theme.backgroundSecondary,
+      borderWidth: 1.5,
+      borderColor: theme.border,
+      padding: 18,
+      borderRadius: 14,
+      color: theme.text,
+      marginBottom: 22,
+      fontSize: 16,
+      fontWeight: '600',
+      textAlign: 'center',
+    },
+    authButton: {
+      width: '100%',
+      overflow: 'hidden',
+      borderRadius: 16,
+      shadowColor: theme.primary,
+      shadowOpacity: 0.35,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 8,
+    },
+    authButtonGradient: {
+      padding: 18,
+      alignItems: 'center',
+      borderRadius: 16,
+    },
+    authButtonText: { color: '#FFFFFF', fontSize: 17, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' },
+    errorText: { color: theme.danger, marginBottom: 20, fontWeight: '700', fontSize: 14 },
     logoutBtn: { padding: 8 },
     toastContainer: {
       position: 'absolute',
       left: 16,
       right: 16,
-      bottom: 20,
-      borderRadius: 14,
-      paddingVertical: 12,
-      paddingHorizontal: 14,
+      bottom: 24,
+      borderRadius: 16,
+      overflow: 'hidden',
       shadowColor: '#000',
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      shadowOffset: { width: 0, height: 3 },
-      elevation: 6,
-      borderWidth: 1,
-      borderColor: theme.border,
+      shadowOpacity: 0.2,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 8,
     },
-    toastText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
+    toastGradient: {
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      borderRadius: 16,
+    },
+    toastText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14, lineHeight: 20 },
     toastActions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10 },
     toastActionBtn: {
       paddingVertical: 6,
-      paddingHorizontal: 10,
-      borderRadius: 8,
+      paddingHorizontal: 12,
+      borderRadius: 10,
       marginLeft: 8,
-      borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.4)',
+      borderWidth: 1.5,
+      borderColor: 'rgba(255,255,255,0.3)',
+      backgroundColor: 'rgba(255,255,255,0.1)',
     },
-    toastActionText: { color: '#FFFFFF', fontWeight: '800', fontSize: 12, textTransform: 'uppercase' },
+    toastActionText: { color: '#FFFFFF', fontWeight: '800', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 },
   });
 
   if (isCheckingAuth) {
@@ -326,7 +456,7 @@ export const AdminQueue = () => {
           <TextInput
             style={styles.authInput}
             placeholder={t('password')}
-            placeholderTextColor={theme.textSecondary}
+            placeholderTextColor={theme.textMuted}
             secureTextEntry
             value={passwordInput}
             onChangeText={setPasswordInput}
@@ -335,8 +465,15 @@ export const AdminQueue = () => {
           
           {authError ? <Text style={styles.errorText}>{authError}</Text> : null}
           
-          <TouchableOpacity style={styles.authButton} onPress={handleLogin}>
-            <Text style={styles.authButtonText}>{t('login')}</Text>
+          <TouchableOpacity style={styles.authButton} onPress={handleLogin} activeOpacity={0.85}>
+            <LinearGradient
+              colors={[theme.gradientPrimaryStart, theme.gradientPrimaryEnd]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.authButtonGradient}
+            >
+              <Text style={styles.authButtonText}>{t('login')}</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </View>
@@ -344,10 +481,10 @@ export const AdminQueue = () => {
   }
 
   const renderItem = ({ item }: { item: Customer }) => (
-    <View style={[styles.card, item.status === 'serving' && { borderColor: theme.primary, borderWidth: 2, shadowColor: theme.primary, shadowOpacity: 0.2, shadowRadius: 15, elevation: 8 }]}>
+    <View style={[styles.card, item.status === 'serving' && styles.cardServing]}>
       <View style={styles.cardHeader}>
         <View>
-            <Text style={styles.name}>{item.name} {item.status === 'serving' && <Text style={{ color: theme.primary, fontSize: 12, fontWeight: '800' }}> ({t('serving')})</Text>}</Text>
+            <Text style={styles.name}>{item.name} {item.status === 'serving' && <Text style={{ color: theme.primary, fontSize: 11, fontWeight: '800', letterSpacing: 0.5 }}> ({t('serving')})</Text>}</Text>
           <Text style={styles.service}>{item.service || t('none')}</Text>
         </View>
         <View style={[styles.badge, item.type === 'online' ? styles.badgeOnline : styles.badgeWalkIn]}>
@@ -357,21 +494,25 @@ export const AdminQueue = () => {
       
       <View style={styles.actions}>
         {item.status !== 'serving' && (
-          <TouchableOpacity style={[styles.actionBtn, styles.btnServing]} onPress={() => handleMarkServing(item)}>
-            <MaterialCommunityIcons name="content-cut" size={18} color="#FFFFFF" />
+          <TouchableOpacity style={styles.actionBtn} onPress={() => handleMarkServing(item)} activeOpacity={0.8}>
+            <LinearGradient colors={[theme.gradientPrimaryStart, theme.gradientPrimaryEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.actionBtnGradient} />
+            <MaterialCommunityIcons name="content-cut" size={16} color="#FFFFFF" />
             <Text style={styles.btnTextPrimary}>{t('serve')}</Text>
           </TouchableOpacity>
         )}
-        <TouchableOpacity style={[styles.actionBtn, styles.btnDone]} onPress={() => handleMarkDone(item)}>
-          <MaterialCommunityIcons name="check-circle" size={18} color="#FFFFFF" />
+        <TouchableOpacity style={styles.actionBtn} onPress={() => handleMarkDone(item)} activeOpacity={0.8}>
+          <LinearGradient colors={[theme.gradientSuccessStart, theme.gradientSuccessEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.actionBtnGradient} />
+          <MaterialCommunityIcons name="check-circle" size={16} color="#FFFFFF" />
           <Text style={styles.btnText}>{t('markDone')}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionBtn, styles.btnMove]} onPress={() => handleMoveDown(item)}>
-          <MaterialCommunityIcons name="arrow-down-bold-circle" size={18} color="#FFFFFF" />
+        <TouchableOpacity style={styles.actionBtn} onPress={() => handleMoveDown(item)} activeOpacity={0.8}>
+          <LinearGradient colors={[theme.gradientWarningStart, theme.gradientWarningEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.actionBtnGradient} />
+          <MaterialCommunityIcons name="arrow-down-bold-circle" size={16} color="#FFFFFF" />
           <Text style={styles.btnText}>{t('moveDown')}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionBtn, styles.btnRemove]} onPress={() => handleRemoveRequest(item)}>
-          <MaterialCommunityIcons name="delete-circle" size={18} color="#FFFFFF" />
+        <TouchableOpacity style={styles.actionBtn} onPress={() => handleRemoveRequest(item)} activeOpacity={0.8}>
+          <LinearGradient colors={[theme.gradientDangerStart, theme.gradientDangerEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.actionBtnGradient} />
+          <MaterialCommunityIcons name="delete-circle" size={16} color="#FFFFFF" />
           <Text style={styles.btnText}>{t('remove')}</Text>
         </TouchableOpacity>
       </View>
@@ -388,12 +529,19 @@ export const AdminQueue = () => {
           <Text style={styles.title}>{t('adminQueue')}</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity style={styles.addButton} onPress={handleAddWalkIn}>
-            <MaterialCommunityIcons name="account-plus" size={20} color="#FFFFFF" />
-            <Text style={styles.addButtonText}>{t('addWalkIn')}</Text>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddWalkIn} activeOpacity={0.85}>
+            <LinearGradient
+              colors={[theme.gradientPrimaryStart, theme.gradientPrimaryEnd]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.addButtonGradient}
+            >
+              <MaterialCommunityIcons name="account-plus" size={18} color="#FFFFFF" />
+              <Text style={styles.addButtonText}>{t('addWalkIn')}</Text>
+            </LinearGradient>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.logoutBtn, { marginLeft: 12 }]} onPress={handleLogout}>
-            <MaterialCommunityIcons name="logout" size={28} color={theme.danger} />
+            <MaterialCommunityIcons name="logout" size={26} color={theme.danger} />
           </TouchableOpacity>
         </View>
       </View>
@@ -402,9 +550,11 @@ export const AdminQueue = () => {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         ListEmptyComponent={
-          <View style={{ alignItems: 'center', marginTop: 60 }}>
-            <MaterialCommunityIcons name="chair-rolling" size={80} color={theme.textSecondary} opacity={0.3} />
-            <Text style={{ color: theme.textSecondary, textAlign: 'center', marginTop: 20, fontSize: 16, fontWeight: '600' }}>{t('queueEmpty')}</Text>
+          <View style={{ alignItems: 'center', marginTop: 60, padding: 20 }}>
+            <View style={{ width: 100, height: 100, borderRadius: 50, backgroundColor: theme.backgroundSecondary, justifyContent: 'center', alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: theme.border }}>
+              <MaterialCommunityIcons name="chair-rolling" size={50} color={theme.textMuted} />
+            </View>
+            <Text style={{ color: theme.textSecondary, textAlign: 'center', marginTop: 4, fontSize: 16, fontWeight: '600' }}>{t('queueEmpty')}</Text>
           </View>
         }
         showsVerticalScrollIndicator={false}
@@ -414,12 +564,14 @@ export const AdminQueue = () => {
       <Modal visible={paymentModalVisible} transparent animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <MaterialCommunityIcons name="cash-register" size={48} color={theme.primary} style={{ alignSelf: 'center', marginBottom: 16 }} />
+            <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: theme.primaryLight, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 18 }}>
+              <MaterialCommunityIcons name="cash-register" size={32} color={theme.primary} />
+            </View>
             <Text style={styles.modalTitle}>{t('paymentModalTitle').toUpperCase()}</Text>
             <TextInput
               style={styles.input}
               placeholder={t('amountPaid')}
-              placeholderTextColor={theme.textSecondary}
+              placeholderTextColor={theme.textMuted}
               keyboardType="decimal-pad"
               value={amountPaid}
               onChangeText={setAmountPaid}
@@ -429,7 +581,13 @@ export const AdminQueue = () => {
               <TouchableOpacity style={[styles.modalBtn, styles.modalBtnCancel]} onPress={() => setPaymentModalVisible(false)}>
                 <Text style={{ color: theme.text, fontWeight: '800' }}>{t('cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalBtn, styles.modalBtnConfirm]} onPress={confirmPayment}>
+              <TouchableOpacity style={[styles.modalBtn, styles.modalBtnConfirm]} onPress={confirmPayment} activeOpacity={0.85}>
+                <LinearGradient
+                  colors={[theme.gradientPrimaryStart, theme.gradientPrimaryEnd]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ ...StyleSheet.absoluteFillObject, borderRadius: 14 }}
+                />
                 <Text style={{ color: '#FFFFFF', fontWeight: '800' }}>{t('confirm')}</Text>
               </TouchableOpacity>
             </View>
@@ -440,12 +598,14 @@ export const AdminQueue = () => {
       <Modal visible={walkInModalVisible} transparent animationType="fade" onRequestClose={() => setWalkInModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <MaterialCommunityIcons name="account-plus" size={48} color={theme.primary} style={{ alignSelf: 'center', marginBottom: 16 }} />
+            <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: theme.primaryLight, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 18 }}>
+              <MaterialCommunityIcons name="account-plus" size={32} color={theme.primary} />
+            </View>
             <Text style={styles.modalTitle}>{t('addWalkIn')}</Text>
             <TextInput
               style={styles.input}
               placeholder={t('name')}
-              placeholderTextColor={theme.textSecondary}
+              placeholderTextColor={theme.textMuted}
               value={walkInName}
               onChangeText={(text) => {
                 setWalkInName(text);
@@ -461,7 +621,13 @@ export const AdminQueue = () => {
               <TouchableOpacity style={[styles.modalBtn, styles.modalBtnCancel]} onPress={() => setWalkInModalVisible(false)}>
                 <Text style={{ color: theme.text, fontWeight: '800' }}>{t('cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalBtn, styles.modalBtnConfirm]} onPress={confirmAddWalkIn}>
+              <TouchableOpacity style={[styles.modalBtn, styles.modalBtnConfirm]} onPress={confirmAddWalkIn} activeOpacity={0.85}>
+                <LinearGradient
+                  colors={[theme.gradientPrimaryStart, theme.gradientPrimaryEnd]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ ...StyleSheet.absoluteFillObject, borderRadius: 14 }}
+                />
                 <Text style={{ color: '#FFFFFF', fontWeight: '800' }}>{t('confirm')}</Text>
               </TouchableOpacity>
             </View>
@@ -470,33 +636,34 @@ export const AdminQueue = () => {
       </Modal>
 
       {toast && (
-        <View
-          style={[
-            styles.toastContainer,
-            {
-              backgroundColor:
-                toast.type === 'success'
-                  ? theme.success
-                  : toast.type === 'danger'
-                    ? theme.danger
-                    : theme.warning,
-            },
-          ]}
-        >
-          <Text style={styles.toastText}>{toast.message}</Text>
-          <View style={styles.toastActions}>
-            {toast.onAction && toast.actionLabel ? (
-              <TouchableOpacity
-                style={styles.toastActionBtn}
-                onPress={toast.onAction}
-              >
-                <Text style={styles.toastActionText}>{toast.actionLabel}</Text>
+        <View style={styles.toastContainer}>
+          <LinearGradient
+            colors={
+              toast.type === 'success'
+                ? [theme.gradientSuccessStart, theme.gradientSuccessEnd]
+                : toast.type === 'danger'
+                  ? [theme.gradientDangerStart, theme.gradientDangerEnd]
+                  : [theme.gradientWarningStart, theme.gradientWarningEnd]
+            }
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.toastGradient}
+          >
+            <Text style={styles.toastText}>{toast.message}</Text>
+            <View style={styles.toastActions}>
+              {toast.onAction && toast.actionLabel ? (
+                <TouchableOpacity
+                  style={styles.toastActionBtn}
+                  onPress={toast.onAction}
+                >
+                  <Text style={styles.toastActionText}>{toast.actionLabel}</Text>
+                </TouchableOpacity>
+              ) : null}
+              <TouchableOpacity style={styles.toastActionBtn} onPress={hideToast}>
+                <Text style={styles.toastActionText}>{toast.dismissLabel || 'OK'}</Text>
               </TouchableOpacity>
-            ) : null}
-            <TouchableOpacity style={styles.toastActionBtn} onPress={hideToast}>
-              <Text style={styles.toastActionText}>{toast.dismissLabel || 'OK'}</Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+          </LinearGradient>
         </View>
       )}
     </View>

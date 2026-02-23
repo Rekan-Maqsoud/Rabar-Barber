@@ -84,18 +84,18 @@ export const joinQueue = async (
   }
 
   const newCustomerRef = push(queueRef);
-  const customerBase = {
+  const customerBase: Record<string, any> = {
     name: cleanedName,
     nameKey,
-    deviceId: type === 'online' ? deviceId : undefined,
-    expoPushToken: type === 'online' ? pushTokens?.expoPushToken : undefined,
-    webPushToken: type === 'online' ? pushTokens?.webPushToken : undefined,
     type,
     status: 'waiting',
     joinedAt: Date.now(),
   };
-  const customer = service ? { ...customerBase, service } : customerBase;
-  await set(newCustomerRef, customer);
+  if (type === 'online' && deviceId) customerBase.deviceId = deviceId;
+  if (type === 'online' && pushTokens?.expoPushToken) customerBase.expoPushToken = pushTokens.expoPushToken;
+  if (type === 'online' && pushTokens?.webPushToken) customerBase.webPushToken = pushTokens.webPushToken;
+  if (service) customerBase.service = service;
+  await set(newCustomerRef, customerBase);
   return newCustomerRef.key;
 };
 

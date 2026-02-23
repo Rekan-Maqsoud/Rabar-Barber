@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Image, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../theme/ThemeContext';
 import { joinQueue, removeCustomer, subscribeToQueue } from '../services/queueService';
@@ -7,6 +7,7 @@ import { Customer, ServiceType } from '../types';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getOrCreateDeviceId } from '../services/deviceService';
 import { registerDevicePushToken } from '../services/notificationService';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export const CustomerView = () => {
   const { t } = useTranslation();
@@ -88,46 +89,183 @@ export const CustomerView = () => {
   const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.background },
     scrollContent: { padding: 20, paddingBottom: 40 },
-    headerContainer: { alignItems: 'center', marginBottom: 24, marginTop: 10 },
+    headerContainer: { alignItems: 'center', marginBottom: 28, marginTop: 14 },
     logoIconContainer: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
+      width: 64,
+      height: 64,
+      borderRadius: 32,
       overflow: 'hidden',
       justifyContent: 'center',
       alignItems: 'center',
-      marginBottom: 12,
-      backgroundColor: theme.surface,
+      marginBottom: 14,
+      backgroundColor: theme.surfaceElevated,
+      borderWidth: 2,
+      borderColor: theme.primaryLight,
+      shadowColor: theme.primary,
+      shadowOpacity: 0.2,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 6,
     },
-    logoIcon: { width: '90%', height: '90%', opacity: 0.9 },
-    welcomeText: { fontSize: 16, color: theme.textSecondary, fontWeight: '600', letterSpacing: 1, textTransform: 'uppercase' },
-    card: { backgroundColor: theme.surface, padding: 24, borderRadius: 20, marginBottom: 20, shadowColor: theme.primary, shadowOpacity: 0.08, shadowRadius: 15, shadowOffset: { width: 0, height: 8 }, elevation: 5, borderWidth: 1, borderColor: theme.border },
-    title: { fontSize: 24, fontWeight: '800', color: theme.text, marginBottom: 24, textAlign: 'center', letterSpacing: 0.5 },
-    input: { backgroundColor: theme.background, color: theme.text, padding: 18, borderRadius: 14, marginBottom: 20, borderWidth: 1, borderColor: theme.border, fontSize: 16, fontWeight: '500' },
-    warningText: { color: theme.danger, fontWeight: '700', marginTop: -12, marginBottom: 14, textAlign: 'center' },
-    joinedInfo: { color: theme.primary, fontWeight: '800', textAlign: 'center', marginBottom: 6 },
-    joinedSubInfo: { color: theme.textSecondary, fontWeight: '600', textAlign: 'center', marginBottom: 4 },
-    leaveButton: { backgroundColor: theme.danger, padding: 14, borderRadius: 12, alignItems: 'center', marginTop: 14 },
-    leaveButtonText: { color: '#FFFFFF', fontWeight: '800', letterSpacing: 0.5 },
-    button: { backgroundColor: theme.primary, padding: 18, borderRadius: 14, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', shadowColor: theme.primary, shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 6, marginTop: 8 },
-    buttonText: { color: '#FFFFFF', fontSize: 18, fontWeight: '800', marginLeft: 10, letterSpacing: 1 },
+    logoIcon: { width: '90%', height: '90%', opacity: 0.95 },
+    welcomeText: { fontSize: 13, color: theme.textMuted, fontWeight: '700', letterSpacing: 2.5, textTransform: 'uppercase' },
+    card: {
+      backgroundColor: theme.surface,
+      padding: 24,
+      borderRadius: 22,
+      marginBottom: 20,
+      shadowColor: theme.cardShadow,
+      shadowOpacity: 1,
+      shadowRadius: 20,
+      shadowOffset: { width: 0, height: 10 },
+      elevation: 6,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    cardAccent: {
+      borderTopWidth: 3,
+      borderTopColor: theme.primary,
+    },
+    title: { fontSize: 22, fontWeight: '800', color: theme.text, marginBottom: 24, textAlign: 'center', letterSpacing: 0.3 },
+    input: {
+      backgroundColor: theme.backgroundSecondary,
+      color: theme.text,
+      padding: 18,
+      borderRadius: 14,
+      marginBottom: 20,
+      borderWidth: 1.5,
+      borderColor: theme.border,
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    warningText: { color: theme.danger, fontWeight: '700', marginTop: -12, marginBottom: 14, textAlign: 'center', fontSize: 13 },
+    joinedInfo: { color: theme.primary, fontWeight: '800', textAlign: 'center', marginBottom: 8, fontSize: 16 },
+    joinedSubInfo: { color: theme.textSecondary, fontWeight: '600', textAlign: 'center', marginBottom: 6, fontSize: 14 },
+    leaveButton: {
+      overflow: 'hidden',
+      borderRadius: 14,
+      marginTop: 16,
+    },
+    leaveButtonGradient: {
+      padding: 16,
+      alignItems: 'center',
+      borderRadius: 14,
+    },
+    leaveButtonText: { color: '#FFFFFF', fontWeight: '800', letterSpacing: 0.5, fontSize: 15 },
+    button: {
+      overflow: 'hidden',
+      borderRadius: 16,
+      marginTop: 8,
+      shadowColor: theme.primary,
+      shadowOpacity: 0.35,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 8,
+    },
+    buttonGradient: {
+      padding: 18,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 16,
+    },
+    buttonText: { color: '#FFFFFF', fontSize: 17, fontWeight: '800', marginLeft: 10, letterSpacing: 1 },
     serviceRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24 },
-    serviceBtn: { flex: 1, padding: 16, borderWidth: 1.5, borderColor: theme.border, borderRadius: 16, marginHorizontal: 6, alignItems: 'center', backgroundColor: theme.surface },
-    serviceBtnActive: { backgroundColor: theme.primary, borderColor: theme.primary, shadowColor: theme.primary, shadowOpacity: 0.3, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
-    serviceText: { color: theme.textSecondary, fontSize: 13, textAlign: 'center', fontWeight: '600', marginTop: 8 },
+    serviceBtn: {
+      flex: 1,
+      padding: 16,
+      borderWidth: 1.5,
+      borderColor: theme.border,
+      borderRadius: 18,
+      marginHorizontal: 5,
+      alignItems: 'center',
+      backgroundColor: theme.surfaceElevated,
+    },
+    serviceBtnActive: {
+      borderColor: theme.primary,
+      borderWidth: 0,
+      overflow: 'hidden',
+    },
+    serviceBtnActiveGradient: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 18,
+    },
+    serviceBtnContent: {
+      alignItems: 'center',
+      paddingVertical: 0,
+    },
+    serviceText: { color: theme.textSecondary, fontSize: 12, textAlign: 'center', fontWeight: '700', marginTop: 8 },
     serviceTextActive: { color: '#FFFFFF', fontWeight: '800' },
-    statBox: { alignItems: 'center', padding: 20, backgroundColor: theme.background, borderRadius: 16, marginBottom: 16, borderWidth: 1, borderColor: theme.border },
-    statLabel: { color: theme.textSecondary, fontSize: 14, marginBottom: 8, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
+    statBox: {
+      alignItems: 'center',
+      padding: 22,
+      backgroundColor: theme.backgroundSecondary,
+      borderRadius: 18,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderLeftWidth: 4,
+      borderLeftColor: theme.primary,
+    },
+    statLabel: { color: theme.textSecondary, fontSize: 12, marginBottom: 8, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 },
     statValue: { color: theme.text, fontSize: 28, fontWeight: '900' },
-    queueListTitle: { fontSize: 20, fontWeight: '800', color: theme.text, marginBottom: 20, marginTop: 8, letterSpacing: 0.5 },
-    queueItem: { flexDirection: 'row', alignItems: 'center', padding: 18, backgroundColor: theme.background, borderRadius: 16, marginBottom: 12, borderWidth: 1, borderColor: theme.border },
-    queueItemMy: { borderColor: theme.primary, borderWidth: 2, backgroundColor: theme.surface, shadowColor: theme.primary, shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 3 },
-    queueItemIndex: { width: 36, fontSize: 18, fontWeight: '800', color: theme.primary },
-    queueItemName: { flex: 1, fontSize: 17, fontWeight: '700', color: theme.text },
-    badge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, marginLeft: 8 },
-    badgeText: { fontSize: 12, fontWeight: '800', color: '#FFF', textTransform: 'uppercase', letterSpacing: 0.5 },
-    badgeOnline: { backgroundColor: theme.primary }, // Gold for online
-    badgeWalkIn: { backgroundColor: theme.textSecondary }, // Gray for walk-in
+    queueListTitle: {
+      fontSize: 18,
+      fontWeight: '800',
+      color: theme.text,
+      marginBottom: 20,
+      marginTop: 8,
+      letterSpacing: 0.5,
+      textTransform: 'uppercase',
+    },
+    queueItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 18,
+      backgroundColor: theme.backgroundSecondary,
+      borderRadius: 16,
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderLeftWidth: 4,
+      borderLeftColor: 'transparent',
+    },
+    queueItemMy: {
+      borderColor: theme.primaryLight,
+      borderWidth: 1.5,
+      borderLeftWidth: 4,
+      borderLeftColor: theme.primary,
+      backgroundColor: theme.surfaceElevated,
+      shadowColor: theme.primary,
+      shadowOpacity: 0.12,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 4,
+    },
+    queueItemIndex: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      backgroundColor: theme.primaryLight,
+      textAlign: 'center',
+      textAlignVertical: 'center',
+      lineHeight: 38,
+      fontSize: 16,
+      fontWeight: '800',
+      color: theme.primary,
+      marginRight: 14,
+      overflow: 'hidden',
+    },
+    queueItemName: { flex: 1, fontSize: 16, fontWeight: '700', color: theme.text },
+    badge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, marginLeft: 8 },
+    badgeText: { fontSize: 10, fontWeight: '800', color: '#FFF', textTransform: 'uppercase', letterSpacing: 0.8 },
+    badgeOnline: { backgroundColor: theme.primary },
+    badgeWalkIn: { backgroundColor: theme.textMuted },
+    sectionDivider: {
+      height: 1,
+      backgroundColor: theme.border,
+      marginVertical: 8,
+    },
   });
 
   if (loading) return <View style={[styles.container, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={theme.primary} /></View>;
@@ -141,14 +279,14 @@ export const CustomerView = () => {
         <Text style={styles.welcomeText}>{t('welcome') || 'Premium Grooming'}</Text>
       </View>
 
-      <View style={styles.card}>
+      <View style={[styles.card, styles.cardAccent]}>
         <Text style={styles.title}>{t('joinQueue')}</Text>
         {!hasActiveEntry ? (
           <>
             <TextInput
               style={styles.input}
               placeholder={t('name')}
-              placeholderTextColor={theme.textSecondary}
+              placeholderTextColor={theme.textMuted}
               value={name}
               onChangeText={(text) => {
                 setName(text);
@@ -162,49 +300,74 @@ export const CustomerView = () => {
                   key={s}
                   style={[styles.serviceBtn, service === s && styles.serviceBtnActive]}
                   onPress={() => setService(s)}
+                  activeOpacity={0.7}
                 >
-                  <MaterialCommunityIcons 
-                    name={s === 'Hair' ? 'content-cut' : s === 'Hair & Beard' ? 'face-man-shimmer' : 'scissors-cutting'} 
-                    size={28} 
-                    color={service === s ? '#FFFFFF' : theme.primary} 
-                  />
-                  <Text style={[styles.serviceText, service === s && styles.serviceTextActive]}>
-                    {s === 'Hair' ? t('hair') : s === 'Hair & Beard' ? t('hairAndBeard') : t('organizeTrim')}
-                  </Text>
+                  {service === s && (
+                    <LinearGradient
+                      colors={[theme.gradientPrimaryStart, theme.gradientPrimaryEnd]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.serviceBtnActiveGradient}
+                    />
+                  )}
+                  <View style={styles.serviceBtnContent}>
+                    <MaterialCommunityIcons 
+                      name={s === 'Hair' ? 'content-cut' : s === 'Hair & Beard' ? 'face-man' : 'auto-fix'} 
+                      size={28} 
+                      color={service === s ? '#FFFFFF' : theme.primary} 
+                    />
+                    <Text style={[styles.serviceText, service === s && styles.serviceTextActive]}>
+                      {s === 'Hair' ? t('hair') : s === 'Hair & Beard' ? t('hairAndBeard') : t('organizeTrim')}
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>
-            <TouchableOpacity style={styles.button} onPress={handleJoin}>
-              <MaterialCommunityIcons name="ticket-confirmation" size={24} color="#FFFFFF" />
-              <Text style={styles.buttonText}>{t('submit')}</Text>
+            <TouchableOpacity style={styles.button} onPress={handleJoin} activeOpacity={0.85}>
+              <LinearGradient
+                colors={[theme.gradientPrimaryStart, theme.gradientPrimaryEnd]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.buttonGradient}
+              >
+                <MaterialCommunityIcons name="ticket-confirmation" size={22} color="#FFFFFF" />
+                <Text style={styles.buttonText}>{t('submit')}</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </>
         ) : (
           <>
             <Text style={styles.joinedInfo}>{t('alreadyJoinedDevice')}</Text>
             <Text style={styles.joinedSubInfo}>{t('inputHiddenAfterJoin')}</Text>
-            <TouchableOpacity style={styles.leaveButton} onPress={handleLeaveQueue}>
-              <Text style={styles.leaveButtonText}>{t('leaveQueue')}</Text>
+            <TouchableOpacity style={styles.leaveButton} onPress={handleLeaveQueue} activeOpacity={0.85}>
+              <LinearGradient
+                colors={[theme.gradientDangerStart, theme.gradientDangerEnd]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.leaveButtonGradient}
+              >
+                <Text style={styles.leaveButtonText}>{t('leaveQueue')}</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </>
         )}
       </View>
 
       <View style={styles.card}>
-        <View style={styles.statBox}>
-          <MaterialCommunityIcons name="content-cut" size={24} color={theme.primary} style={{ marginBottom: 8 }} />
+        <View style={[styles.statBox, { borderLeftColor: theme.accent }]}>
+          <MaterialCommunityIcons name="content-cut" size={26} color={theme.accent} style={{ marginBottom: 10 }} />
           <Text style={styles.statLabel}>{t('currentlyServing')}</Text>
-          <Text style={styles.statValue}>{currentlyServing ? currentlyServing.name : t('none')}</Text>
+          <Text style={[styles.statValue, { color: currentlyServing ? theme.primary : theme.textMuted }]}>{currentlyServing ? currentlyServing.name : t('none')}</Text>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View style={[styles.statBox, { flex: 1, marginRight: 8 }]}>
-            <MaterialCommunityIcons name="account-group" size={24} color={theme.textSecondary} style={{ marginBottom: 8 }} />
+          <View style={[styles.statBox, { flex: 1, marginRight: 8, borderLeftColor: theme.textSecondary }]}>
+            <MaterialCommunityIcons name="account-group" size={24} color={theme.textSecondary} style={{ marginBottom: 10 }} />
             <Text style={styles.statLabel}>{t('totalInQueue')}</Text>
             <Text style={styles.statValue}>{waitingQueue.length}</Text>
           </View>
           {myId && (
-            <View style={[styles.statBox, { flex: 1, marginLeft: 8, borderColor: theme.primary, backgroundColor: theme.surface }]}>
-              <MaterialCommunityIcons name="clock-fast" size={24} color={theme.primary} style={{ marginBottom: 8 }} />
+            <View style={[styles.statBox, { flex: 1, marginLeft: 8, borderLeftColor: theme.primary, backgroundColor: theme.primaryLight }]}>
+              <MaterialCommunityIcons name="clock-fast" size={24} color={theme.primary} style={{ marginBottom: 10 }} />
               <Text style={[styles.statLabel, { color: theme.primary }]}>{t('peopleAhead')}</Text>
               <Text style={[styles.statValue, { color: theme.primary }]}>{peopleAhead}</Text>
             </View>
@@ -226,7 +389,7 @@ export const CustomerView = () => {
           ))}
         </View>
       )}
-      <View style={{ height: 40 }} />
+      <View style={{ height: 50 }} />
     </ScrollView>
   );
 };

@@ -23,14 +23,44 @@ export const AppNavigator = () => {
 
   const renderHeaderRight = (navigation: any) => (
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <TouchableOpacity onPress={toggleLanguage} style={{ marginRight: 16, padding: 4 }}>
-        <Text style={{ color: theme.primary, fontWeight: '800', fontSize: 16 }}>{i18n.language.toUpperCase()}</Text>
+      <TouchableOpacity
+        onPress={toggleLanguage}
+        style={{
+          marginRight: 14,
+          paddingHorizontal: 10,
+          paddingVertical: 5,
+          borderRadius: 8,
+          backgroundColor: theme.backgroundSecondary,
+          borderWidth: 1,
+          borderColor: theme.border,
+        }}
+      >
+        <Text style={{ color: theme.primary, fontWeight: '800', fontSize: 13, letterSpacing: 0.5 }}>{i18n.language.toUpperCase()}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 16, padding: 4 }}>
-        <Ionicons name={isDark ? 'sunny' : 'moon'} size={24} color={theme.primary} />
+      <TouchableOpacity
+        onPress={toggleTheme}
+        style={{
+          marginRight: 14,
+          padding: 6,
+          borderRadius: 10,
+          backgroundColor: theme.backgroundSecondary,
+          borderWidth: 1,
+          borderColor: theme.border,
+        }}
+      >
+        <Ionicons name={isDark ? 'sunny' : 'moon'} size={20} color={theme.primary} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('AdminQueue')} style={{ padding: 4 }}>
-        <MaterialCommunityIcons name="shield-account" size={26} color={theme.primary} />
+      <TouchableOpacity
+        onPress={() => navigation.navigate('AdminQueue')}
+        style={{
+          padding: 6,
+          borderRadius: 10,
+          backgroundColor: theme.primaryLight,
+          borderWidth: 1,
+          borderColor: theme.border,
+        }}
+      >
+        <MaterialCommunityIcons name="shield-account" size={22} color={theme.primary} />
       </TouchableOpacity>
     </View>
   );
@@ -42,7 +72,7 @@ export const AppNavigator = () => {
           headerStyle: { backgroundColor: theme.surface },
           headerTintColor: theme.primary,
           headerShadowVisible: false,
-          headerTitleStyle: { fontWeight: '800', fontSize: 22, letterSpacing: 1 },
+          headerTitleStyle: { fontWeight: '800', fontSize: 20, letterSpacing: 1.2, color: theme.text },
           headerRight: () => renderHeaderRight(navigation),
         })}
       >
@@ -57,8 +87,17 @@ export const AppNavigator = () => {
           options={({ navigation }: { navigation: any }) => ({
             title: t('adminQueue').toUpperCase(),
             headerRight: () => (
-              <TouchableOpacity onPress={() => navigation.navigate('AdminAnalytics')} style={{ padding: 4 }}>
-                <Ionicons name="stats-chart" size={24} color={theme.primary} />
+              <TouchableOpacity
+                onPress={() => navigation.navigate('AdminAnalytics')}
+                style={{
+                  padding: 6,
+                  borderRadius: 10,
+                  backgroundColor: theme.primaryLight,
+                  borderWidth: 1,
+                  borderColor: theme.border,
+                }}
+              >
+                <Ionicons name="stats-chart" size={20} color={theme.primary} />
               </TouchableOpacity>
             )
           })} 
