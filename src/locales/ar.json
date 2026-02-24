@@ -62,6 +62,9 @@
     "theme": "المظهر",
     "light": "فاتح",
     "dark": "داكن",
+    "madeByDeveloper": "تم التطوير بواسطة Rekan M Koye",
+    "developerContactIntro": "لتطوير المواقع والتطبيقات يمكنك التواصل مع:",
+    "facebookProfileLabel": "facebook.com/rekan.m.koye",
     "privacyPolicy": "سياسة الخصوصية"
   }
 }

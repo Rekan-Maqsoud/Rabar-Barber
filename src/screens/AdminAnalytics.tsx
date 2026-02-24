@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, useWindowDimensions } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../theme/ThemeContext';
 import { getRevenueStats } from '../services/queueService';
@@ -9,6 +11,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 export const AdminAnalytics = () => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
+  const { width } = useWindowDimensions();
+  const navigation = useNavigation<any>();
   const [stats, setStats] = useState({
     today: 0,
     weekly: 0,
@@ -26,6 +30,8 @@ export const AdminAnalytics = () => {
   });
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
   const [loading, setLoading] = useState(true);
 
   const formatIQD = (value: number) => `IQD ${Math.round(value).toLocaleString()}`;
@@ -40,15 +46,28 @@ export const AdminAnalytics = () => {
   };
 
   useEffect(() => {
-    const fetchStats = async () => {
-      const data = await getRevenueStats();
-      setStats(data);
-      if (data.monthlyHistory.length > 0) {
-        setSelectedMonth(data.monthlyHistory[data.monthlyHistory.length - 1].monthStart);
+    const checkAccessAndFetchStats = async () => {
+      try {
+        const authStatus = await AsyncStorage.getItem('admin_auth');
+        const hasAccess = authStatus === 'true';
+        setIsAuthorized(hasAccess);
+
+        if (!hasAccess) return;
+
+        const data = await getRevenueStats();
+        setStats(data);
+        if (data.monthlyHistory.length > 0) {
+          setSelectedMonth(data.monthlyHistory[data.monthlyHistory.length - 1].monthStart);
+        }
+      } catch (error) {
+        console.error('Failed to load analytics access or data', error);
+      } finally {
+        setIsCheckingAccess(false);
+        setLoading(false);
       }
-      setLoading(false);
     };
-    fetchStats();
+
+    checkAccessAndFetchStats();
   }, []);
 
   const monthOptions = stats.monthlyHistory;
@@ -76,6 +95,7 @@ export const AdminAnalytics = () => {
   };
 
   const selectedMonthSeries = getDailySeriesForSelectedMonth();
+  const contentMaxWidth = width >= 1200 ? 1080 : width >= 768 ? 840 : '100%';
 
   const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.background, padding: 20 },
@@ -175,12 +195,50 @@ export const AdminAnalytics = () => {
     dropdownItem: { paddingVertical: 12, paddingHorizontal: 14, backgroundColor: theme.backgroundSecondary },
     dropdownItemActive: { backgroundColor: theme.primaryLight, borderLeftWidth: 4, borderLeftColor: theme.primary },
     dropdownItemText: { color: theme.text, fontWeight: '600' },
+    blockedContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: theme.background },
+    blockedCard: {
+      width: '100%',
+      maxWidth: 420,
+      backgroundColor: theme.surface,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: theme.border,
+      padding: 24,
+      alignItems: 'center',
+    },
+    blockedTitle: { color: theme.text, fontSize: 18, fontWeight: '800', marginTop: 14, marginBottom: 8, textAlign: 'center' },
+    blockedText: { color: theme.textSecondary, fontWeight: '600', textAlign: 'center', marginBottom: 18 },
+    blockedButton: {
+      backgroundColor: theme.primary,
+      borderRadius: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 18,
+      width: '100%',
+      alignItems: 'center',
+    },
+    blockedButtonText: { color: '#FFFFFF', fontWeight: '800' },
   });
 
-  if (loading) return <View style={[styles.container, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={theme.primary} /></View>;
+  if (loading || isCheckingAccess) return <View style={[styles.container, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={theme.primary} /></View>;
+
+  if (!isAuthorized) {
+    return (
+      <View style={styles.blockedContainer}>
+        <View style={styles.blockedCard}>
+          <MaterialCommunityIcons name="shield-lock-outline" size={44} color={theme.primary} />
+          <Text style={styles.blockedTitle}>Owner Access Only</Text>
+          <Text style={styles.blockedText}>Only the shop owner can view analytics and stats.</Text>
+          <TouchableOpacity style={styles.blockedButton} onPress={() => navigation.navigate('AdminQueue')}>
+            <Text style={styles.blockedButtonText}>Go to Admin Queue</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+      <View style={{ width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center' }}>
       <Text style={styles.title}>{t('adminAnalytics')}</Text>
 
       <View style={styles.miniGrid}>
@@ -377,6 +435,7 @@ export const AdminAnalytics = () => {
       </View>
       
       <View style={{ height: 40 }} />
+      </View>
     </ScrollView>
   );
 };

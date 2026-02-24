@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Image, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Image, Platform, Linking, useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../theme/ThemeContext';
@@ -13,6 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 export const CustomerView = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { width } = useWindowDimensions();
   const navigation = useNavigation<any>();
   const [name, setName] = useState('');
   const [service, setService] = useState<ServiceType | undefined>();
@@ -22,6 +23,7 @@ export const CustomerView = () => {
   const [pushTokens, setPushTokens] = useState<{ expoPushToken?: string; webPushToken?: string }>({});
   const [loading, setLoading] = useState(true);
   const [joinWarning, setJoinWarning] = useState('');
+  const [showDeveloperContact, setShowDeveloperContact] = useState(false);
 
   useEffect(() => {
     const initDevice = async () => {
@@ -87,10 +89,15 @@ export const CustomerView = () => {
   const myIndex = myId ? waitingQueue.findIndex(c => c.id === myId) : -1;
   const peopleAhead = myIndex > -1 ? myIndex : waitingQueue.length;
   const hasActiveEntry = !!myId;
+  const contentMaxWidth = width >= 1366 ? 620 : width >= 1024 ? 640 : width >= 768 ? 660 : '100%';
 
   const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.background },
-    scrollContent: { padding: 20, paddingBottom: 40 },
+    scrollContent: {
+      paddingVertical: 20,
+      paddingHorizontal: width >= 1024 ? 12 : width >= 768 ? 12 : 10,
+      paddingBottom: 40,
+    },
     headerContainer: { alignItems: 'center', marginBottom: 28, marginTop: 14 },
     logoIconContainer: {
       width: 64,
@@ -279,6 +286,58 @@ export const CustomerView = () => {
       fontWeight: '600',
       marginBottom: 4,
     },
+    footerNameRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    infoButton: {
+      width: 18,
+      height: 18,
+      borderRadius: 9,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: 6,
+      backgroundColor: theme.primaryLight,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    infoButtonText: {
+      color: theme.primary,
+      fontWeight: '900',
+      fontSize: 11,
+      lineHeight: 12,
+    },
+    contactContainer: {
+      marginTop: 8,
+      width: '100%',
+      maxWidth: 340,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.border,
+      backgroundColor: theme.backgroundSecondary,
+    },
+    contactText: {
+      color: theme.textSecondary,
+      fontSize: 11,
+      fontWeight: '600',
+      marginBottom: 8,
+      textAlign: 'center',
+    },
+    contactRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 6,
+    },
+    contactLink: {
+      color: theme.primary,
+      fontSize: 11,
+      fontWeight: '700',
+      marginLeft: 6,
+    },
     footerLink: {
       fontSize: 11,
       color: theme.primary,
@@ -290,6 +349,7 @@ export const CustomerView = () => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <View style={{ width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center' }}>
       <View style={styles.headerContainer}>
         <View style={styles.logoIconContainer}>
           <Image source={require('../../assets/icon.png')} style={styles.logoIcon} resizeMode="cover" />
@@ -408,12 +468,43 @@ export const CustomerView = () => {
         </View>
       )}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Made By Rekan M Koye</Text>
+        <View style={styles.footerNameRow}>
+          <Text style={styles.footerText}>{t('madeByDeveloper')}</Text>
+          <TouchableOpacity
+            style={styles.infoButton}
+            onPress={() => setShowDeveloperContact((prev) => !prev)}
+            activeOpacity={0.75}
+          >
+            <Text style={styles.infoButtonText}>!</Text>
+          </TouchableOpacity>
+        </View>
+
+        {showDeveloperContact && (
+          <View style={styles.contactContainer}>
+            <Text style={styles.contactText}>{t('developerContactIntro')}</Text>
+
+            <View style={styles.contactRow}>
+              <MaterialCommunityIcons name="phone" size={14} color={theme.primary} />
+              <TouchableOpacity onPress={() => Linking.openURL('tel:07517197673')} activeOpacity={0.7}>
+                <Text style={styles.contactLink}>07517197673</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.contactRow}>
+              <MaterialCommunityIcons name="facebook" size={14} color={theme.primary} />
+              <TouchableOpacity onPress={() => Linking.openURL('https://www.facebook.com/rekan.m.koye')} activeOpacity={0.7}>
+                <Text style={styles.contactLink}>{t('facebookProfileLabel')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
         <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')} activeOpacity={0.7}>
           <Text style={styles.footerLink}>{t('privacyPolicy')}</Text>
         </TouchableOpacity>
       </View>
       <View style={{ height: 50 }} />
+      </View>
     </ScrollView>
   );
 };

@@ -1,9 +1,11 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 
 export const PrivacyPolicy = () => {
   const { theme } = useTheme();
+  const { width } = useWindowDimensions();
+  const contentMaxWidth = width >= 1200 ? 980 : width >= 768 ? 820 : '100%';
 
   const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.background },
@@ -38,6 +40,7 @@ export const PrivacyPolicy = () => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={{ width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center' }}>
       <View style={styles.card}>
         <Text style={styles.updatedAt}>Last updated: February 23, 2026</Text>
 
@@ -95,6 +98,7 @@ export const PrivacyPolicy = () => {
         <Text style={styles.body}>
           For privacy questions, contact the shop administration directly through official shop communication channels.
         </Text>
+      </View>
       </View>
     </ScrollView>
   );

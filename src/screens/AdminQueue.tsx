@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TextInput, ActivityIndicator, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TextInput, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../theme/ThemeContext';
 import { subscribeToQueue, markAsDone, removeCustomer, moveDown, markAsServing, joinQueue } from '../services/queueService';
@@ -14,6 +14,7 @@ const ADMIN_PASSWORD = 'admin'; // Simple password for demonstration
 export const AdminQueue = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { width } = useWindowDimensions();
   const [queue, setQueue] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [paymentModalVisible, setPaymentModalVisible] = useState(false);
@@ -216,6 +217,8 @@ export const AdminQueue = () => {
       0,
     );
   };
+
+  const contentMaxWidth = width >= 1200 ? 1080 : width >= 768 ? 820 : '100%';
 
   const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.background, padding: 16 },
@@ -521,6 +524,7 @@ export const AdminQueue = () => {
 
   return (
     <View style={styles.container}>
+      <View style={{ width: '100%', maxWidth: contentMaxWidth, alignSelf: 'center', flex: 1 }}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.brandIconContainer}>
@@ -560,6 +564,7 @@ export const AdminQueue = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
       />
+      </View>
 
       <Modal visible={paymentModalVisible} transparent animationType="fade">
         <View style={styles.modalContainer}>

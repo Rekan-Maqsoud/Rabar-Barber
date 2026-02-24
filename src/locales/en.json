@@ -62,6 +62,9 @@
     "theme": "Theme",
     "light": "Light",
     "dark": "Dark",
+    "madeByDeveloper": "Made By Rekan M Koye",
+    "developerContactIntro": "For developing websites and applications, you may contact:",
+    "facebookProfileLabel": "facebook.com/rekan.m.koye",
     "privacyPolicy": "Privacy Policy"
   }
 }

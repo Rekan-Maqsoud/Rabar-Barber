@@ -34,13 +34,19 @@ export const AppNavigator = () => {
     i18n.changeLanguage(nextLang);
   };
 
+  const getLanguageLabel = () => {
+    if (i18n.language === 'ckb') return 'کوردی';
+    if (i18n.language === 'ar') return 'العربية';
+    return 'English';
+  };
+
   const renderHeaderRight = (navigation: any) => (
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <TouchableOpacity
         onPress={toggleLanguage}
         style={{
           marginRight: 14,
-          paddingHorizontal: 10,
+          paddingHorizontal: 12,
           paddingVertical: 5,
           borderRadius: 8,
           backgroundColor: theme.backgroundSecondary,
@@ -48,7 +54,7 @@ export const AppNavigator = () => {
           borderColor: theme.border,
         }}
       >
-        <Text style={{ color: theme.primary, fontWeight: '800', fontSize: 13, letterSpacing: 0.5 }}>{i18n.language.toUpperCase()}</Text>
+        <Text style={{ color: theme.primary, fontWeight: '800', fontSize: 13, letterSpacing: 0.2 }}>{getLanguageLabel()}</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={toggleTheme}
