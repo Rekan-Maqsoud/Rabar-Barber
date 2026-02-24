@@ -53,6 +53,7 @@ export const joinQueue = async (
   type: 'online' | 'walk-in' = 'online',
   deviceId?: string,
   pushTokens?: { expoPushToken?: string; webPushToken?: string },
+  bookingHour?: number,
 ) => {
   const { cleanedName, nameKey } = validateAndSanitizeName(name);
   const queueRef = ref(db, QUEUE_REF);
@@ -84,13 +85,30 @@ export const joinQueue = async (
   }
 
   const newCustomerRef = push(queueRef);
+  const insertedAt = Date.now();
+  const hasValidBookingHour =
+    typeof bookingHour === 'number' && Number.isInteger(bookingHour) && bookingHour >= 0 && bookingHour <= 23;
+  const bookingFor = hasValidBookingHour
+    ? (() => {
+        const now = new Date(insertedAt);
+        const bookingDate = new Date(now);
+        bookingDate.setHours(bookingHour as number, 0, 0, 0);
+        if (bookingDate.getTime() <= insertedAt) {
+          bookingDate.setDate(bookingDate.getDate() + 1);
+        }
+        return bookingDate.getTime();
+      })()
+    : undefined;
+
   const customerBase: Record<string, any> = {
     name: cleanedName,
     nameKey,
     type,
     status: 'waiting',
-    joinedAt: Date.now(),
+    insertedAt,
+    joinedAt: bookingFor ?? insertedAt,
   };
+  if (bookingFor) customerBase.bookingFor = bookingFor;
   if (type === 'online' && deviceId) customerBase.deviceId = deviceId;
   if (type === 'online' && pushTokens?.expoPushToken) customerBase.expoPushToken = pushTokens.expoPushToken;
   if (type === 'online' && pushTokens?.webPushToken) customerBase.webPushToken = pushTokens.webPushToken;
@@ -142,6 +160,7 @@ export const markAsDone = async (customer: Customer, amountPaid: number) => {
   const newRevenueRef = push(revenueRef);
   const revenueLogBase = {
     amount: amountPaid,
+    customerName: customer.name,
     timestamp: now,
   };
   const revenueLog = customer.service ? { ...revenueLogBase, service: customer.service } : revenueLogBase;
@@ -184,9 +203,9 @@ export const getRevenueStats = async () => {
       dailyAverageThisMonth: 0,
       popularService: 'None',
       monthlyHistory: [],
-      serviceBreakdown: [],
       recentDays: [],
       dailyRevenueByMonth: [],
+      recentCustomers: [],
     };
   }
 
@@ -209,23 +228,23 @@ export const getRevenueStats = async () => {
   let totalRevenue = 0;
   let totalCustomersToday = 0;
   const serviceCounts: Record<string, number> = {};
-  const serviceRevenue: Record<string, number> = {};
   const monthMap: Record<string, { monthStart: number; revenue: number; customers: number }> = {};
   const dayMap: Record<string, { dayStart: number; revenue: number; customers: number }> = {};
   const monthDayMap: Record<string, Record<string, { dayStart: number; revenue: number; customers: number }>> = {};
 
   logs.forEach(log => {
-    totalRevenue += log.amount;
+    const amount = Number(log.amount) || 0;
+    totalRevenue += amount;
 
     if (log.timestamp >= startOfToday) {
-      today += log.amount;
+      today += amount;
       totalCustomersToday++;
     }
     if (log.timestamp >= startOfWeek) {
-      weekly += log.amount;
+      weekly += amount;
     }
     if (log.timestamp >= startOfMonth) {
-      monthly += log.amount;
+      monthly += amount;
     }
 
     const logDate = new Date(log.timestamp);
@@ -234,7 +253,7 @@ export const getRevenueStats = async () => {
     if (!monthMap[monthKey]) {
       monthMap[monthKey] = { monthStart, revenue: 0, customers: 0 };
     }
-    monthMap[monthKey].revenue += log.amount;
+    monthMap[monthKey].revenue += amount;
     monthMap[monthKey].customers += 1;
 
     const dayStart = new Date(logDate.getFullYear(), logDate.getMonth(), logDate.getDate()).getTime();
@@ -242,7 +261,7 @@ export const getRevenueStats = async () => {
     if (!dayMap[dayKey]) {
       dayMap[dayKey] = { dayStart, revenue: 0, customers: 0 };
     }
-    dayMap[dayKey].revenue += log.amount;
+    dayMap[dayKey].revenue += amount;
     dayMap[dayKey].customers += 1;
 
     if (!monthDayMap[monthKey]) {
@@ -251,12 +270,11 @@ export const getRevenueStats = async () => {
     if (!monthDayMap[monthKey][dayKey]) {
       monthDayMap[monthKey][dayKey] = { dayStart, revenue: 0, customers: 0 };
     }
-    monthDayMap[monthKey][dayKey].revenue += log.amount;
+    monthDayMap[monthKey][dayKey].revenue += amount;
     monthDayMap[monthKey][dayKey].customers += 1;
     
     if (log.service) {
       serviceCounts[log.service] = (serviceCounts[log.service] || 0) + 1;
-      serviceRevenue[log.service] = (serviceRevenue[log.service] || 0) + log.amount;
     }
   });
 
@@ -275,14 +293,6 @@ export const getRevenueStats = async () => {
       ...item,
       averageTicket: item.customers > 0 ? item.revenue / item.customers : 0,
     }));
-
-  const serviceBreakdown = Object.keys(serviceCounts)
-    .map((service) => ({
-      service,
-      count: serviceCounts[service],
-      revenue: serviceRevenue[service] || 0,
-    }))
-    .sort((a, b) => b.count - a.count);
 
   const recentDays = Array.from({ length: 14 }, (_, index) => {
     const offset = 13 - index;
@@ -307,6 +317,16 @@ export const getRevenueStats = async () => {
   const totalCustomersAllTime = logs.length;
   const averageTicket = totalCustomersAllTime > 0 ? totalRevenue / totalCustomersAllTime : 0;
   const dailyAverageThisMonth = daysPassedThisMonth > 0 ? monthly / daysPassedThisMonth : 0;
+  const recentCustomers = logs
+    .slice()
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 12)
+    .map((log) => ({
+      id: log.id,
+      name: log.customerName || 'Unknown',
+      amount: Number(log.amount) || 0,
+      timestamp: log.timestamp,
+    }));
 
   return {
     today,
@@ -319,8 +339,8 @@ export const getRevenueStats = async () => {
     dailyAverageThisMonth,
     popularService,
     monthlyHistory,
-    serviceBreakdown,
     recentDays,
     dailyRevenueByMonth,
+    recentCustomers,
   };
 };

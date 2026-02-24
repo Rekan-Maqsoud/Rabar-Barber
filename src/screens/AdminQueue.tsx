@@ -21,6 +21,7 @@ export const AdminQueue = () => {
   const [amountPaid, setAmountPaid] = useState('');
   const [walkInModalVisible, setWalkInModalVisible] = useState(false);
   const [walkInName, setWalkInName] = useState('');
+  const [walkInBookingHour, setWalkInBookingHour] = useState<number | null>(null);
   const [walkInError, setWalkInError] = useState('');
   
   // Auth state
@@ -36,6 +37,7 @@ export const AdminQueue = () => {
     dismissLabel?: string;
   } | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const quickPaymentAmounts = [2000, 3000, 4000, 5000, 6000];
 
   useEffect(() => {
     checkAuth();
@@ -153,6 +155,7 @@ export const AdminQueue = () => {
 
   const handleAddWalkIn = () => {
     setWalkInName('');
+    setWalkInBookingHour(null);
     setWalkInError('');
     setWalkInModalVisible(true);
   };
@@ -164,10 +167,11 @@ export const AdminQueue = () => {
       return;
     }
     try {
-      await joinQueue(trimmedName, undefined, 'walk-in');
+      await joinQueue(trimmedName, undefined, 'walk-in', undefined, undefined, walkInBookingHour ?? undefined);
       showToast({ message: `${trimmedName} added to queue.`, type: 'success' });
       setWalkInModalVisible(false);
       setWalkInName('');
+      setWalkInBookingHour(null);
       setWalkInError('');
     } catch (error: any) {
       console.error('Failed to add walk-in customer', error);
@@ -219,6 +223,52 @@ export const AdminQueue = () => {
   };
 
   const contentMaxWidth = width >= 1200 ? 1080 : width >= 768 ? 820 : '100%';
+
+  const to12Hour = (hour24: number) => {
+    const period: 'AM' | 'PM' = hour24 >= 12 ? 'PM' : 'AM';
+    const normalized = hour24 % 12;
+    return {
+      hour12: normalized === 0 ? 12 : normalized,
+      period,
+    };
+  };
+
+  const to24Hour = (hour12: number, period: 'AM' | 'PM') => {
+    const normalized = hour12 % 12;
+    return period === 'PM' ? normalized + 12 : normalized;
+  };
+
+  const formatScheduleTime = (hour24: number) => {
+    const { hour12, period } = to12Hour(hour24);
+    return `${hour12}:00 ${period === 'AM' ? t('amShort') : t('pmShort')}`;
+  };
+
+  const toggleWalkInBookingHour = () => {
+    setWalkInBookingHour((prev) => {
+      const base = prev ?? new Date().getHours();
+      const { hour12, period } = to12Hour(base);
+      const nextHour12 = hour12 === 12 ? 1 : hour12 + 1;
+      return to24Hour(nextHour12, period);
+    });
+  };
+
+  const toggleWalkInBookingPeriod = () => {
+    setWalkInBookingHour((prev) => {
+      const base = prev ?? new Date().getHours();
+      const { hour12, period } = to12Hour(base);
+      const nextPeriod = period === 'AM' ? 'PM' : 'AM';
+      return to24Hour(hour12, nextPeriod);
+    });
+  };
+
+  const formatClockTime = (timestamp?: number) => {
+    if (!timestamp) return '';
+    return new Intl.DateTimeFormat(undefined, {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(new Date(timestamp));
+  };
 
   const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.background, padding: 16 },
@@ -286,6 +336,7 @@ export const AdminQueue = () => {
     cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
     name: { fontSize: 19, fontWeight: '800', color: theme.text, letterSpacing: 0.3 },
     service: { fontSize: 13, color: theme.primary, marginTop: 6, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 },
+    metaTime: { fontSize: 12, color: theme.textSecondary, marginTop: 6, fontWeight: '600' },
     badge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 },
     badgeText: { fontSize: 10, fontWeight: '800', color: '#FFF', textTransform: 'uppercase', letterSpacing: 0.8 },
     badgeOnline: { backgroundColor: theme.primary },
@@ -335,6 +386,37 @@ export const AdminQueue = () => {
       backgroundColor: theme.backgroundSecondary,
       fontWeight: '600',
       textAlign: 'center',
+    },
+    quickAmountRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      marginTop: -4,
+      marginBottom: 14,
+    },
+    quickAmountBtn: {
+      width: '31%',
+      minWidth: 92,
+      paddingVertical: 10,
+      borderRadius: 12,
+      borderWidth: 1.2,
+      borderColor: theme.border,
+      backgroundColor: theme.backgroundSecondary,
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    quickAmountBtnActive: {
+      borderColor: theme.primary,
+      backgroundColor: theme.primaryLight,
+    },
+    quickAmountText: {
+      color: theme.textSecondary,
+      fontSize: 12,
+      fontWeight: '700',
+    },
+    quickAmountTextActive: {
+      color: theme.primary,
+      fontWeight: '800',
     },
     modalActions: { flexDirection: 'row', justifyContent: 'space-between' },
     modalBtn: { paddingVertical: 14, borderRadius: 14, flex: 1, alignItems: 'center', marginHorizontal: 6 },
@@ -440,6 +522,50 @@ export const AdminQueue = () => {
       backgroundColor: 'rgba(255,255,255,0.1)',
     },
     toastActionText: { color: '#FFFFFF', fontWeight: '800', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 },
+    bookingRow: {
+      marginTop: -4,
+      marginBottom: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+    },
+    bookingButton: {
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: 12,
+      backgroundColor: theme.backgroundSecondary,
+      borderWidth: 1,
+      borderColor: theme.border,
+      marginRight: 8,
+      marginBottom: 8,
+    },
+    bookingButtonActive: {
+      backgroundColor: theme.primaryLight,
+      borderColor: theme.primary,
+    },
+    bookingButtonText: {
+      color: theme.textSecondary,
+      fontWeight: '700',
+      fontSize: 12,
+    },
+    bookingButtonTextActive: {
+      color: theme.primary,
+      fontWeight: '800',
+    },
+    bookingHint: {
+      marginTop: -2,
+      marginBottom: 4,
+      color: theme.textSecondary,
+      fontSize: 11,
+      fontWeight: '700',
+    },
+    bookingHintSub: {
+      marginTop: -1,
+      marginBottom: 14,
+      color: theme.textMuted,
+      fontSize: 11,
+      fontWeight: '600',
+    },
   });
 
   if (isCheckingAuth) {
@@ -488,6 +614,10 @@ export const AdminQueue = () => {
       <View style={styles.cardHeader}>
         <View>
             <Text style={styles.name}>{item.name} {item.status === 'serving' && <Text style={{ color: theme.primary, fontSize: 11, fontWeight: '800', letterSpacing: 0.5 }}> ({t('serving')})</Text>}</Text>
+          <Text style={styles.metaTime}>
+            {t('insertedAtLabel')}: {formatClockTime(item.insertedAt || item.joinedAt)}
+            {item.bookingFor ? ` • ${t('bookedForLabel')}: ${formatClockTime(item.bookingFor)}` : ''}
+          </Text>
           <Text style={styles.service}>{item.service || t('none')}</Text>
         </View>
         <View style={[styles.badge, item.type === 'online' ? styles.badgeOnline : styles.badgeWalkIn]}>
@@ -582,6 +712,21 @@ export const AdminQueue = () => {
               onChangeText={setAmountPaid}
               autoFocus
             />
+            <View style={styles.quickAmountRow}>
+              {quickPaymentAmounts.map((amount) => {
+                const isActive = amountPaid === String(amount);
+                return (
+                  <TouchableOpacity
+                    key={amount}
+                    style={[styles.quickAmountBtn, isActive && styles.quickAmountBtnActive]}
+                    onPress={() => setAmountPaid(String(amount))}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.quickAmountText, isActive && styles.quickAmountTextActive]}>{amount}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
             <View style={styles.modalActions}>
               <TouchableOpacity style={[styles.modalBtn, styles.modalBtnCancel]} onPress={() => setPaymentModalVisible(false)}>
                 <Text style={{ color: theme.text, fontWeight: '800' }}>{t('cancel')}</Text>
@@ -619,6 +764,41 @@ export const AdminQueue = () => {
               onSubmitEditing={confirmAddWalkIn}
               autoFocus
             />
+            <View style={styles.bookingRow}>
+              <TouchableOpacity
+                style={[styles.bookingButton, walkInBookingHour !== null && styles.bookingButtonActive]}
+                onPress={toggleWalkInBookingHour}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.bookingButtonText, walkInBookingHour !== null && styles.bookingButtonTextActive]}>
+                  {walkInBookingHour === null
+                    ? t('bookForHourOptional')
+                    : t('bookForHourValue12', { time: formatScheduleTime(walkInBookingHour) })}
+                </Text>
+              </TouchableOpacity>
+              {walkInBookingHour !== null && (
+                <TouchableOpacity
+                  style={[styles.bookingButton, styles.bookingButtonActive]}
+                  onPress={toggleWalkInBookingPeriod}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.bookingButtonText, styles.bookingButtonTextActive]}>
+                    {to12Hour(walkInBookingHour).period === 'AM' ? t('amShort') : t('pmShort')}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {walkInBookingHour !== null && (
+                <TouchableOpacity
+                  style={styles.bookingButton}
+                  onPress={() => setWalkInBookingHour(null)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.bookingButtonText}>{t('clearBookingHour')}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            <Text style={styles.bookingHint}>{t('bookingTapHint')}</Text>
+            <Text style={styles.bookingHintSub}>{t('bookingAmPmHint')}</Text>
             {!!walkInError && (
               <Text style={{ color: theme.danger, fontWeight: '700', textAlign: 'center', marginBottom: 12 }}>{walkInError}</Text>
             )}

@@ -21,9 +21,56 @@ export const CustomerView = () => {
   const [myId, setMyId] = useState<string | null>(null);
   const [myDeviceId, setMyDeviceId] = useState<string | null>(null);
   const [pushTokens, setPushTokens] = useState<{ expoPushToken?: string; webPushToken?: string }>({});
+  const [bookingHour, setBookingHour] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [joinWarning, setJoinWarning] = useState('');
   const [showDeveloperContact, setShowDeveloperContact] = useState(false);
+
+  const to12Hour = (hour24: number) => {
+    const period: 'AM' | 'PM' = hour24 >= 12 ? 'PM' : 'AM';
+    const normalized = hour24 % 12;
+    return {
+      hour12: normalized === 0 ? 12 : normalized,
+      period,
+    };
+  };
+
+  const to24Hour = (hour12: number, period: 'AM' | 'PM') => {
+    const normalized = hour12 % 12;
+    return period === 'PM' ? normalized + 12 : normalized;
+  };
+
+  const formatScheduleTime = (hour24: number) => {
+    const { hour12, period } = to12Hour(hour24);
+    return `${hour12}:00 ${period === 'AM' ? t('amShort') : t('pmShort')}`;
+  };
+
+  const toggleBookingHour = () => {
+    setBookingHour((prev) => {
+      const base = prev ?? new Date().getHours();
+      const { hour12, period } = to12Hour(base);
+      const nextHour12 = hour12 === 12 ? 1 : hour12 + 1;
+      return to24Hour(nextHour12, period);
+    });
+  };
+
+  const toggleBookingPeriod = () => {
+    setBookingHour((prev) => {
+      const base = prev ?? new Date().getHours();
+      const { hour12, period } = to12Hour(base);
+      const nextPeriod = period === 'AM' ? 'PM' : 'AM';
+      return to24Hour(hour12, nextPeriod);
+    });
+  };
+
+  const formatClockTime = (timestamp?: number) => {
+    if (!timestamp) return '';
+    return new Intl.DateTimeFormat(undefined, {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(new Date(timestamp));
+  };
 
   useEffect(() => {
     const initDevice = async () => {
@@ -61,10 +108,11 @@ export const CustomerView = () => {
       const deviceId = myDeviceId || (await getOrCreateDeviceId());
       if (!myDeviceId) setMyDeviceId(deviceId);
 
-      const id = await joinQueue(name, service, 'online', deviceId, pushTokens);
+      const id = await joinQueue(name, service, 'online', deviceId, pushTokens, bookingHour ?? undefined);
       setMyId(id);
       setName('');
       setService(undefined);
+      setBookingHour(null);
       setJoinWarning('');
     } catch (error: any) {
       const key = error?.message || 'join_failed';
@@ -266,6 +314,8 @@ export const CustomerView = () => {
       overflow: 'hidden',
     },
     queueItemName: { flex: 1, fontSize: 16, fontWeight: '700', color: theme.text },
+    queueItemMain: { flex: 1 },
+    queueItemMeta: { marginTop: 4, color: theme.textSecondary, fontSize: 12, fontWeight: '600' },
     badge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, marginLeft: 8 },
     badgeText: { fontSize: 10, fontWeight: '800', color: '#FFF', textTransform: 'uppercase', letterSpacing: 0.8 },
     badgeOnline: { backgroundColor: theme.primary },
@@ -343,6 +393,50 @@ export const CustomerView = () => {
       color: theme.primary,
       fontWeight: '700',
     },
+    bookingRow: {
+      marginTop: -2,
+      marginBottom: 18,
+      flexDirection: 'row',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+    },
+    bookingButton: {
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderRadius: 12,
+      backgroundColor: theme.backgroundSecondary,
+      borderWidth: 1,
+      borderColor: theme.border,
+      marginRight: 10,
+      marginBottom: 8,
+    },
+    bookingButtonActive: {
+      backgroundColor: theme.primaryLight,
+      borderColor: theme.primary,
+    },
+    bookingButtonText: {
+      color: theme.textSecondary,
+      fontWeight: '700',
+      fontSize: 12,
+    },
+    bookingButtonTextActive: {
+      color: theme.primary,
+      fontWeight: '800',
+    },
+    bookingHint: {
+      marginTop: -2,
+      marginBottom: 4,
+      color: theme.textSecondary,
+      fontSize: 11,
+      fontWeight: '700',
+    },
+    bookingHintSub: {
+      marginTop: -1,
+      marginBottom: 14,
+      color: theme.textMuted,
+      fontSize: 11,
+      fontWeight: '600',
+    },
   });
 
   if (loading) return <View style={[styles.container, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={theme.primary} /></View>;
@@ -401,6 +495,41 @@ export const CustomerView = () => {
                 </TouchableOpacity>
               ))}
             </View>
+            <View style={styles.bookingRow}>
+              <TouchableOpacity
+                style={[styles.bookingButton, bookingHour !== null && styles.bookingButtonActive]}
+                onPress={toggleBookingHour}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.bookingButtonText, bookingHour !== null && styles.bookingButtonTextActive]}>
+                  {bookingHour === null
+                    ? t('bookForHourOptional')
+                    : t('bookForHourValue12', { time: formatScheduleTime(bookingHour) })}
+                </Text>
+              </TouchableOpacity>
+              {bookingHour !== null && (
+                <TouchableOpacity
+                  style={[styles.bookingButton, styles.bookingButtonActive]}
+                  onPress={toggleBookingPeriod}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.bookingButtonText, styles.bookingButtonTextActive]}>
+                    {to12Hour(bookingHour).period === 'AM' ? t('amShort') : t('pmShort')}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {bookingHour !== null && (
+                <TouchableOpacity
+                  style={styles.bookingButton}
+                  onPress={() => setBookingHour(null)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.bookingButtonText}>{t('clearBookingHour')}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            <Text style={styles.bookingHint}>{t('bookingTapHint')}</Text>
+            <Text style={styles.bookingHintSub}>{t('bookingAmPmHint')}</Text>
             <TouchableOpacity style={styles.button} onPress={handleJoin} activeOpacity={0.85}>
               <LinearGradient
                 colors={[theme.gradientPrimaryStart, theme.gradientPrimaryEnd]}
@@ -459,7 +588,13 @@ export const CustomerView = () => {
           {waitingQueue.map((customer, index) => (
             <View key={customer.id} style={[styles.queueItem, customer.id === myId && styles.queueItemMy]}>
               <Text style={styles.queueItemIndex}>{index + 1}</Text>
-              <Text style={styles.queueItemName}>{customer.name} {customer.id === myId ? `(${t('you')})` : ''}</Text>
+              <View style={styles.queueItemMain}>
+                <Text style={styles.queueItemName}>{customer.name} {customer.id === myId ? `(${t('you')})` : ''}</Text>
+                <Text style={styles.queueItemMeta}>
+                  {t('insertedAtLabel')}: {formatClockTime(customer.insertedAt || customer.joinedAt)}
+                  {customer.bookingFor ? ` • ${t('bookedForLabel')}: ${formatClockTime(customer.bookingFor)}` : ''}
+                </Text>
+              </View>
               <View style={[styles.badge, customer.type === 'online' ? styles.badgeOnline : styles.badgeWalkIn]}>
                 <Text style={styles.badgeText}>{customer.type === 'online' ? t('online') : t('walkIn')}</Text>
               </View>

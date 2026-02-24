@@ -24,9 +24,9 @@ export const AdminAnalytics = () => {
     dailyAverageThisMonth: 0,
     popularService: 'None',
     monthlyHistory: [] as { monthStart: number; revenue: number; customers: number; averageTicket: number }[],
-    serviceBreakdown: [] as { service: string; count: number; revenue: number }[],
     recentDays: [] as { dayStart: number; revenue: number; customers: number }[],
     dailyRevenueByMonth: [] as { monthStart: number; days: { dayStart: number; revenue: number; customers: number }[] }[],
+    recentCustomers: [] as { id: string; name: string; amount: number; timestamp: number }[],
   });
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
@@ -37,13 +37,6 @@ export const AdminAnalytics = () => {
   const formatIQD = (value: number) => `IQD ${Math.round(value).toLocaleString()}`;
 
   const locale = i18n.language === 'ar' ? 'ar-IQ' : i18n.language === 'en' ? 'en-US' : 'ckb-IQ';
-
-  const formatService = (service: string) => {
-    if (service === 'Hair') return t('hair');
-    if (service === 'Hair & Beard') return t('hairAndBeard');
-    if (service === 'Organize/Trim') return t('organizeTrim');
-    return service;
-  };
 
   useEffect(() => {
     const checkAccessAndFetchStats = async () => {
@@ -217,6 +210,17 @@ export const AdminAnalytics = () => {
       alignItems: 'center',
     },
     blockedButtonText: { color: '#FFFFFF', fontWeight: '800' },
+    recentRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+    },
+    recentName: { color: theme.text, fontWeight: '700', fontSize: 14, flex: 1 },
+    recentMeta: { color: theme.textMuted, fontWeight: '600', fontSize: 11, marginTop: 2 },
+    recentAmount: { color: theme.primary, fontWeight: '800', fontSize: 13, marginLeft: 10 },
   });
 
   if (loading || isCheckingAccess) return <View style={[styles.container, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={theme.primary} /></View>;
@@ -316,7 +320,7 @@ export const AdminAnalytics = () => {
         </View>
         <View style={styles.contentContainer}>
           <Text style={styles.label}>{t('mostPopularService')}</Text>
-          <Text style={[styles.value, { fontSize: 20 }]}>{stats.popularService === 'None' ? t('none') : formatService(stats.popularService)}</Text>
+          <Text style={[styles.value, { fontSize: 20 }]}>{stats.popularService === 'None' ? t('none') : stats.popularService}</Text>
         </View>
       </View>
 
@@ -406,32 +410,26 @@ export const AdminAnalytics = () => {
       </View>
 
       <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>{t('servicePerformance')}</Text>
-        {stats.serviceBreakdown.length === 0 && (
+        <Text style={styles.sectionTitle}>{t('recentCustomerPayments')}</Text>
+        {stats.recentCustomers.length === 0 && (
           <Text style={{ color: theme.textSecondary, fontWeight: '700' }}>{t('none')}</Text>
         )}
-        {stats.serviceBreakdown.map((item) => {
-          const maxCount = Math.max(...stats.serviceBreakdown.map((s) => s.count), 1);
-          const widthPercent = Math.max((item.count / maxCount) * 100, 6);
-          return (
-            <View key={item.service} style={styles.serviceRow}>
-              <View style={styles.serviceHeader}>
-                <Text style={styles.serviceName}>{formatService(item.service)}</Text>
-                <Text style={styles.serviceMeta}>{item.count} • {formatIQD(item.revenue)}</Text>
-              </View>
-              <View style={styles.serviceBarTrack}>
-                <View style={[styles.serviceBarFill, { width: `${widthPercent}%` as `${number}%` }]}>
-                  <LinearGradient
-                    colors={[theme.gradientPrimaryStart, theme.gradientAccentEnd]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.serviceBarGradient}
-                  />
-                </View>
-              </View>
+        {stats.recentCustomers.map((item) => (
+          <View key={item.id} style={styles.recentRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.recentName}>{item.name === 'Unknown' ? t('unknownCustomer') : item.name}</Text>
+              <Text style={styles.recentMeta}>
+                {new Date(item.timestamp).toLocaleString(locale, {
+                  day: '2-digit',
+                  month: 'short',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                })}
+              </Text>
             </View>
-          );
-        })}
+            <Text style={styles.recentAmount}>{formatIQD(item.amount)}</Text>
+          </View>
+        ))}
       </View>
       
       <View style={{ height: 40 }} />
